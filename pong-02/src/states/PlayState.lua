@@ -2,10 +2,10 @@
 PlayState = Class{__includes = BaseState}
 
 function PlayState:init(def)
-    self.upButton   = MoveUpCommand() 
-    self.downButton = MoveDownCommand()
-    -- self.upButton   = MoveDownCommand()
-    -- self.downButton = MoveUpCommand() 
+    -- self.upButton   = MoveUpCommand() 
+    -- self.downButton = MoveDownCommand()
+    self.upButton   = MoveDownCommand()
+    self.downButton = MoveUpCommand() 
 end
 
 function PlayState:enter(params)
@@ -23,11 +23,10 @@ function PlayState:exit()
 end
 
 function PlayState:handleInput(paddle)
+    paddle.dy = PADDLE_SPEED
     if love.keyboard.isDown('up') then
-        paddle.dy = -PADDLE_SPEED
         return self.upButton
     elseif love.keyboard.isDown('down') then
-        paddle.dy = PADDLE_SPEED
         return self.downButton
     else
         return nil
@@ -105,6 +104,7 @@ function PlayState:checkCollisions()
         sounds['wall_hit']:play()
     end
 end
+
 
 function PlayState:checkForWin()
     -- if we reach the left edge of the screen, go back to serve

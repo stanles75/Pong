@@ -7,11 +7,10 @@ function StartState:init(def)
 end
 
 function StartState:handleInput(paddle)
+    paddle.dy = PADDLE_SPEED
     if love.keyboard.isDown('up') then
-        paddle.dy = -PADDLE_SPEED
         return self.upButton
     elseif love.keyboard.isDown('down') then
-        paddle.dy = PADDLE_SPEED
         return self.downButton
     else
         return nil
