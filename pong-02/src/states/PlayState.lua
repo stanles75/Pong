@@ -2,10 +2,10 @@
 PlayState = Class{__includes = BaseState}
 
 function PlayState:init(def)
-    -- self.upButton   = MoveUpCommand() 
-    -- self.downButton = MoveDownCommand()
-    self.upButton   = MoveDownCommand()
-    self.downButton = MoveUpCommand() 
+    self.upButton   = MoveUpCommand() 
+    self.downButton = MoveDownCommand()
+    -- self.upButton   = MoveDownCommand()
+    -- self.downButton = MoveUpCommand() 
 end
 
 function PlayState:enter(params)
@@ -22,10 +22,12 @@ function PlayState:exit()
 
 end
 
-function PlayState:handleInput()
+function PlayState:handleInput(paddle)
     if love.keyboard.isDown('up') then
+        paddle.dy = -PADDLE_SPEED
         return self.upButton
     elseif love.keyboard.isDown('down') then
+        paddle.dy = PADDLE_SPEED
         return self.downButton
     else
         return nil
@@ -33,10 +35,34 @@ function PlayState:handleInput()
 end
 
 function PlayState:update(dt)
-    -- if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
-    --     gStateMachine:change('serve')
+
+    self:checkCollisions()
+    self:checkForWin()
+
+    -- player 1 - convert to AI Player
+    local aiCommand
+    aiCommand = self.player1:processAI(self.ball)
+    if aiCommand then
+        aiCommand:execute(self.player1, dt)
+    end
+
+    -- player 2 - convert to AI Player
+    -- local aiCommand
+    -- aiCommand = self.player2:processAI(self.ball)
+    -- if aiCommand then
+    --     aiCommand:execute(self.player2, dt)
     -- end
 
+    -- player 2    
+    local playerCommand = self:handleInput(self.player2)
+    if playerCommand then
+        playerCommand:execute(self.player2, dt)
+    end
+
+    self.ball:update(dt)    
+end
+
+function PlayState:checkCollisions()
     -- detect ball collision with paddles, reversing dx if true and
     -- slightly increasing it, then altering the dy based on the position
     -- at which it collided, then playing a sound effect
@@ -52,8 +78,7 @@ function PlayState:update(dt)
         end
 
         sounds['paddle_hit']:play()
-    end
-    if self.ball:collides(self.player2) then
+    elseif self.ball:collides(self.player2) then
         self.ball.dx = -self.ball.dx * 1.03
         self.ball.x = self.player2.x - 4
 
@@ -73,15 +98,15 @@ function PlayState:update(dt)
         self.ball.y = 0
         self.ball.dy = -self.ball.dy
         sounds['wall_hit']:play()
-    end
-
     -- -4 to account for the ball's size
-    if self.ball.y >= VIRTUAL_HEIGHT - 4 then
+    elseif self.ball.y >= VIRTUAL_HEIGHT - 4 then
         self.ball.y = VIRTUAL_HEIGHT - 4
         self.ball.dy = -self.ball.dy
         sounds['wall_hit']:play()
     end
+end
 
+function PlayState:checkForWin()
     -- if we reach the left edge of the screen, go back to serve
     -- and update the score and serving player
     if self.ball.x < 0 then
@@ -147,32 +172,8 @@ function PlayState:update(dt)
             })
         end
     end
-
-    -- player 1 - convert to AI Player
-    --   * Match the ball's dy unless it would cause the paddle to move away from the ball
-    --   * Move back toward the middle between serves
-    if self.player1.y > self.ball.y and self.ball.dy > 0 then
-        self.player1.dy = -self.ball.dy
-    elseif self.player1.y < self.ball.y and self.ball.dy < 0 then
-        self.player1.dy = -self.ball.dy
-    else
-        self.player1.dy = self.ball.dy
-    end
-    -- if ball/paddle y coords are far apart on a shallow bounce, speed up the paddle
-    if math.abs(self.player1.y - self.ball.y) > (VIRTUAL_HEIGHT * 0.05)  then
-        self.player1.dy = self.player1.dy * 10
-    end
-
-    -- player 2    
-    local command = self:handleInput()
-    if command then
-        command:execute(self.player2, dt)
-    end
-
-    self.player1:update(dt)
-    --self.player2:update(dt)
-    self.ball:update(dt)    
 end
+
 
 function PlayState:render()
     love.graphics.clear(40/255, 45/255, 52/255, 1)
@@ -182,7 +183,6 @@ function PlayState:render()
     self.ball:render()    
     self:displayScore()
 end
-
 
 --[[
     Simple function for rendering the scores.

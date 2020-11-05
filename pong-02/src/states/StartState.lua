@@ -2,7 +2,20 @@
 StartState = Class{__includes = BaseState}
 
 function StartState:init(def)
+    self.upButton   = MoveUpCommand() 
+    self.downButton = MoveDownCommand()
+end
 
+function StartState:handleInput(paddle)
+    if love.keyboard.isDown('up') then
+        paddle.dy = -PADDLE_SPEED
+        return self.upButton
+    elseif love.keyboard.isDown('down') then
+        paddle.dy = PADDLE_SPEED
+        return self.downButton
+    else
+        return nil
+    end
 end
 
 function StartState:enter(params)
@@ -42,15 +55,11 @@ function StartState:update(dt)
             player2Score    = self.player2Score
         })
     end
-    -- player 2
-    if love.keyboard.isDown('up') then
-        self.player2.dy = -PADDLE_SPEED
-    elseif love.keyboard.isDown('down') then
-        self.player2.dy = PADDLE_SPEED
-    else
-        self.player2.dy = 0
+    -- player 2    
+    local playerCommand = self:handleInput(self.player2)
+    if playerCommand then
+        playerCommand:execute(self.player2, dt)
     end
-    self.player2:update(dt)
 end
 
 function StartState:render()

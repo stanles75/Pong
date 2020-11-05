@@ -2,7 +2,20 @@
 ServeState = Class{__includes = BaseState}
 
 function ServeState:init(def)
+    self.upButton   = MoveUpCommand() 
+    self.downButton = MoveDownCommand()
+end
 
+function ServeState:handleInput(paddle)
+    if love.keyboard.isDown('up') then
+        paddle.dy = -PADDLE_SPEED
+        return self.upButton
+    elseif love.keyboard.isDown('down') then
+        paddle.dy = PADDLE_SPEED
+        return self.downButton
+    else
+        return nil
+    end
 end
 
 function ServeState:enter(params)
@@ -42,33 +55,17 @@ function ServeState:update(dt)
     end
 
     -- player 1 - convert to AI Player
-    --   * Match the ball's dy unless it would cause the paddle to move away from the ball
-    --   * Move back toward the middle between serves
-    if math.abs(self.player1.y-self.ball.y) < 10 then
-        self.player1.dy = 0
-    elseif self.player1.y > self.ball.y and self.ball.dy > 0 then
-        self.player1.dy = -self.ball.dy
-    elseif self.player1.y < self.ball.y and self.ball.dy < 0 then
-        self.player1.dy = -self.ball.dy
-    else
-        self.player1.dy = self.ball.dy
-    end
-    -- if ball/paddle y coords are far apart on a shallow bounce, speed up the paddle
-    if math.abs(self.player1.y - self.ball.y) > (VIRTUAL_HEIGHT * 0.05)  then
-        self.player1.dy = self.player1.dy * 10
-    end
-    
-    -- player 2
-    if love.keyboard.isDown('up') then
-        self.player2.dy = -PADDLE_SPEED
-    elseif love.keyboard.isDown('down') then
-        self.player2.dy = PADDLE_SPEED
-    else
-        self.player2.dy = 0
+    local aiCommand
+    aiCommand = self.player1:processAI(self.ball)
+    if aiCommand then
+        aiCommand:execute(self.player1, dt)
     end
 
-    self.player1:update(dt)
-    self.player2:update(dt)
+    -- player 2    
+    local playerCommand = self:handleInput(self.player2)
+    if playerCommand then
+        playerCommand:execute(self.player2, dt)
+    end
 end
 
 function ServeState:render()
