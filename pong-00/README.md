@@ -1,4 +1,2 @@
-# Roguelike_Tutorial
- Missed the roguelike tutorial this summer.  Gonna do it myself and see what happens!
- 
- Here's the reddit link: https://www.reddit.com/r/roguelikedev/wiki/python_tutorial_series#wiki_version_2020
+# Pong - The Original
+ This version of Pong is the assignment I turned in for CS50G a while back with some basic AI.
