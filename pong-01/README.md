@@ -1,0 +1,2 @@
+# Pong - The State Machine Update
+I'm going to redo this one formally with the state machine we learned about later on in the course.  I'm going to do my best to leave optimatizations out so I can keep the code as close the original as possible.
