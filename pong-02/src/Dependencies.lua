@@ -3,6 +3,11 @@ Class    = require 'lib/class'
 push     = require 'lib/push'
 require 'lib/StateMachine'
 
+--Commands
+require 'src/commands/Command'
+require 'src/commands/MoveDownCommand'
+require 'src/commands/MoveUpCommand'
+
 -- States
 require 'src/states/BaseState'
 require 'src/states/StartState'
@@ -19,6 +24,5 @@ require 'src/Paddle'
 require 'src/Ball'
 require 'src/constants'
 
--- Debug
+-- debug
 require 'conf'
-
