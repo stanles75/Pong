@@ -1,2 +1,2 @@
 # Pong - The Original
- This version of Pong is the assignment I turned in for CS50G a while back with some basic AI.
+ This version of Pong is the assignment I turned in for CS50G a while back with some basic AI. It already uses the Game Loop and Update Method patterns.  I guess you kinda have to use the game loop pattern with LOVE2D.  The Paddle and Ball 'classes' definitely use the Update Method.
